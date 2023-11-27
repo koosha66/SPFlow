@@ -3,7 +3,7 @@ Created on March 25, 2018
 @author: Alejandro Molina
 """
 import numpy as np
-from sklearn.cluster import KMeans, DBSCAN
+from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
 from sklearn.mixture import GaussianMixture
 from sklearn.metrics import pairwise
 
@@ -31,6 +31,22 @@ def init_rpy():
         robjects.r(code)
 
     numpy2ri.activate()
+
+
+def get_split_rows_Agg(n_clusters=2, pre_proc=None, ohe=False, agg_linkage= "ward"):
+    def split_rows_Agg(local_data, ds_context, scope):
+        data = preproc(local_data, ds_context, pre_proc, ohe)
+        
+        #if standardize:
+        #    scaler = StandardScaler().fit(data)
+        #    standardized_data = scaler.transform(data)
+        #    clusters = KMeans(n_clusters=n_clusters, random_state=seed,init="random").fit_predict(standardized_data)
+        #else:
+        clusters = AgglomerativeClustering(n_clusters=n_clusters, linkage = agg_linkage).fit_predict(data)
+        return split_data_by_clusters(local_data, clusters, scope, rows=True)
+    
+    return split_rows_Agg
+
 
 
 def get_split_rows_KMeans(n_clusters=2, pre_proc=None, ohe=False, seed=17, standardize=False):
